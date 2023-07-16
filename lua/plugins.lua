@@ -5,13 +5,85 @@ vim.cmd[[packadd packer.nvim]] -- required if packer configured as `opt`
 return require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'
 
+    ---- nvim-treesitter ----
+    use {
+        'nvim-treesitter/nvim-treesitter',
+        run = ':TSUpdate',
+        config = function()
+            require('nvim-treesitter.configs').setup{
+                indent = {
+                    enable = true
+                }
+            }
+        end
+    }
+
+    vim.o.foldmethod = 'expr'
+    vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+    vim.o.foldenable = false -- disable on startup
+
+    ---- hop ----
+    use {
+        'phaazon/hop.nvim',
+        branch = 'v2',
+        config = function()
+            local hop = require('hop')
+        
+            hop.setup{ 
+                keys = 'etovxqpdygfblzhckisuran'
+            }
+
+            local directions = require('hop.hint').HintDirection
+
+            vim.keymap.set('', 'f', function()
+                hop.hint_char1({ current_line_only = true })
+            end, {remap=true})
+
+            vim.keymap.set('', '<S-F>', hop.hint_char1, { remap = true })
+            vim.keymap.set('', '<C-f>', function() hop.hint_words({ current_line_only = true }) end, { remap = true })
+            vim.keymap.set('', '<C-S-F>', hop.hint_words, { remap = true })
+        end
+    }
+
+    ---- surround ----
+    use({
+        'kylechui/nvim-surround',
+        tag = '*', -- use for stability; omit to use `main` branch for the latest features
+        config = function()
+            require('nvim-surround').setup({
+                keymaps = {
+                    --insert = '<NOP>', --'<C-g>s',
+                    --insert_line = '<NOP>', --'<C-g>S',
+                    normal = 'ys',
+                    --normal_cur = 'yS', --'yss',
+                    normal_line = 'yS',
+                    --normal_cur_line = '<NOP>', --'ySS',
+                    visual = 's', --'S',
+                    visual_line = 's', --'gS',
+                    delete = 'ds',
+                    change = 'cs',
+                    --change_line = '<NOP>', --'cS',
+                }
+            })
+
+            vim.keymap.set('n', 'ss', 'ys', { noremap = false })
+            vim.keymap.set('n', 'sc', 'cs', { noremap = false })
+            vim.keymap.set('n', 'sd', 'ds', { noremap = false })
+        end
+    })
+
+    ---- nkterm ----
     use '~/Documents/Projects/nkterm.nvim'
     vim.keymap.set({'n', 't'}, '<C-,>', [[<C-\><C-n>:NkTermToggle<CR>]], { noremap = true })
 
+    ---- tokyonight - colorscheme ----
     use 'folke/tokyonight.nvim'
-    vim.cmd[[colorscheme tokyonight-night]]
+    --vim.cmd[[colorscheme tokyonight-night]]
 
-    -- file tree side bar
+    use { "catppuccin/nvim", as = "catppuccin" }
+    vim.cmd[[colorscheme catppuccin-mocha]]
+
+    ---- nvim-tree ----
     vim.g.loaded_netrwPlugin = 1
     vim.g.loaded_netrw = 1
     use 'nvim-tree/nvim-tree.lua'
@@ -47,25 +119,20 @@ return require('packer').startup(function(use)
 
     vim.keymap.set('n', '<A-,>', '<ESC>:NvimTreeToggle<CR>', { noremap = true })
 
-    -- nice icons for nvim-tree
+    ---- nvim-web-devicons - nice icons for nvim-tree ----
     use 'nvim-tree/nvim-web-devicons' 
-    
-    -- indent guard lines
-    use 'lukas-reineke/indent-blankline.nvim'
-    
-    -- tab lines
-    --use 'romgrk/barbar.nvim'
 
-    -- tree-sitter syntax highlighting
-    -- use 'nvim-treesitter/nvim-treesitter'
-    -- Check supported languages: https://github.com/nvim-treesitter/nvim-treesitter#supported-languages
-    -- run :TSInstall <language_to_install>
+    ---- indent-blankline - indent guard lines ----
+    use 'lukas-reineke/indent-blankline.nvim'
+
+    ---- barbar - buffer tab line ----
+    --use 'romgrk/barbar.nvim'
 
     -- automatically sync
     vim.cmd([[
-      augroup packer_user_config
+        augroup packer_user_config
         autocmd!
         autocmd BufWritePost plugins.lua source <afile> | PackerCompile
-      augroup end
+        augroup end
     ]])
 end)
