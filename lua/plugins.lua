@@ -5,6 +5,15 @@ vim.cmd[[packadd packer.nvim]] -- required if packer configured as `opt`
 return require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'
 
+    ---- nvim-lspconfig ----
+    --use 'neovim/nvim-lspconfig'
+    --local lspconfig = require('lspconfig')
+    --lspconfig.hls.setup({
+    --    cmd = {'haskell-language-server-wrapper'}
+    --})
+
+    --use 'MrcJkb/haskell-tools.nvim'
+
     ---- nvim-treesitter ----
     use {
         'nvim-treesitter/nvim-treesitter',
@@ -17,6 +26,8 @@ return require('packer').startup(function(use)
             }
         end
     }
+
+    use 'tree-sitter/tree-sitter-haskell' -- didn't do anything, but TSInstall haskell did?
 
     vim.o.foldmethod = 'expr'
     vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
